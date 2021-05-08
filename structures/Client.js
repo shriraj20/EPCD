@@ -5,6 +5,7 @@ const {
 } = require('discord.js')
 const figlet = require('figlet')
 const chalk = require('chalk')
+const config = require('../config.json');
 
 
 class EPCDCLIENT extends Client {
@@ -18,7 +19,6 @@ class EPCDCLIENT extends Client {
 		this.commands = new Collection();
 		this.threads = new Collection();
 		//Constants
-    this.config = require('../config.json');
 		this.prefix = "";
 	}
 	commandHandler(path) {
@@ -46,7 +46,8 @@ class EPCDCLIENT extends Client {
 
 		this.on('message', async (message) => {
 			if (message.guild) {
-				this.prefix = config.prefix
+
+  this.prefix = config.prefix
 				if (message.author.bot || !message.guild || !message.content.toLowerCase().startsWith(this.prefix)) return;
 				const args = message.content.slice(this.prefix.length).trim().split(/ +/g);
 				const cmd = args.shift().toLowerCase();
