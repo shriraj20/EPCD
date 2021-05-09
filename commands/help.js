@@ -1,66 +1,51 @@
-const Discord = require("discord.js")
 const Client = require('../structures/Client');
+const Discord = require('discord.js')
+const { prefix } = require('.././config.json');
 
-const pagination = require('discord.js-pagination')
-const Discord = require("discord.js")
-const Client = require('../structures/Client');
 
 module.exports = {
 	name: "help",
+	description: "Help",
+  usage: 'help',
 	/**
 	 * @param {Client} client
 	 * @param {message} message
 	 * @param {string[]} args
 	 */
-	run: async (client, message, args) => {
-    const embed = new Discord.MessageEmbed()
-		embed.setDescription('These are my commands')
-    embed.addField('add discord.js-paiginton','test')
-		/*
-		message.channel.send(embed)
-				const embed = new Discord.MessageEmbed()
-			.setTitle('')
-			.setColor('RANDOM')
-			.setThumbnail(client.user.displayAvatarURL({ dynamic: true }))
-			.setDescription('')
-			.addField('Page:', '')
-			.addField('Page:', '')
-			.addField('Page:', '');
-		const p1 = new Discord.MessageEmbed()
-			.setTitle('Bot Help Menu')
-			.setDescription('Page: Moderation')
-			.setColor('RANDOM')
-			.addField('Ban', 'User / Bot')
-			.addField('purge', 'ammount of Messges 100')
-			.addField('nuke', 'ereases all the messages of a channel')
+run: async (client, message, args) => {  
+  		const data = [];
+		const { commands } = message.client;
+if (!args.length) {
+	data.push('Here\'s a list of all my commands:');
+	data.push(commands.map(command => command.name).join(', '));
+	data.push(`\nYou can send \`${prefix}help [command name]\` to get info on a specific command!`);
 
-		const p2 = new Discord.MessageEmbed()
-			.setTitle('Bot Help Menu')
-			.setDescription('Page: Fun')
-			.addField('github', 'search up a coder from github')
-			.addField('ascii','this will make your text bubble')
-			.addField('whois', 'Information about a user')
-			.addField('screenshot', 'this will screenshot a webpage')
-			.addField('youtube', 'ID of voice channel')
-			.addField('npm', 'Search a NODEJS package')
-			.addField('betrayal', 'A Discord Game supported only on pc')
-			.addField('fishington', 'A Discord Game supported only on pc')
-			.addField('clyde', 'Say something as the discord  secret mascot clyde')
-			.addField('pokernight', 'A Discord Game supported only on pc not functoning')
-			.setColor('RANDOM')
-		const p3 = new Discord.MessageEmbed()
-			.setTitle('Bot Help Menu')
-			.setDescription('Page: Uttilty')
-			.setColor('RANDOM')
-			.addField('info','info about a bot')
-			.addField('serverinfo', 'info about a server')
-            .addField('uptime', 'Tells how long the bots been online')
-		pages = [
-			embed,
-			p1,
-			p2,
-			p3
-		] */
+	return message.author.send(data, { split: true })
+		.then(() => {
+			if (message.channel.type === 'dm') return;
+			message.reply('I\'ve sent you a DM with all my commands!');
+		})
+		.catch(error => {
+			console.error(`Could not send help DM to ${message.author.tag}.\n`, error);
+			message.reply('it seems like I can\'t DM you! Do you have DMs disabled?');
+		});
+}
 
-	}
+const name = args[0].toLowerCase();
+const command = commands.get(name) || commands.find(c => c.aliases && c.aliases.includes(name));
+
+if (!command) {
+	return message.reply('that\'s not a valid command!');
+}
+
+data.push(`**Name:** ${command.name}`);
+
+if (command.aliases) data.push(`**Aliases:** ${command.aliases.join(', ')}`);
+if (command.description) data.push(`**Description:** ${command.description}`);
+if (command.usage) data.push(`**Usage:** ${prefix}${command.usage}`);
+
+data.push(`**Cooldown:** ${command.cooldown || 3} second(s)`);
+
+message.channel.send(data, { split: true });
+    }
 }
